@@ -19,17 +19,14 @@ UNEQUAL = 4
 
 
 def sublist(list_one, list_two):
-    str_l1 = "-".join([str(x) for x in list_one])
-    str_l2 = "-".join([str(x) for x in list_two])
+    list_one_str = (str(list_one).strip('[]')+",")
+    list_two_str = (str(list_two).strip('[]')+",")
 
-    if len(list_one) == len(list_two):
-        if all([x == y for x, y in zip(list_one, list_two)]):
-            return EQUAL
-    elif len(list_one) > len(list_two):
-        if str_l2 in str_l1:
-            return SUPERLIST
-    elif len(list_one) < len(list_two):
-        if str_l1 in str_l2:
-            return SUBLIST
+    if list_one_str == list_two_str:
+        return EQUAL
+    elif list_one_str in list_two_str:
+        return SUBLIST
+    elif list_two_str in list_one_str:
+        return SUPERLIST
 
     return UNEQUAL
