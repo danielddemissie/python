@@ -35,6 +35,8 @@ export interface Website {
 }
 
 export interface RuleResult {
-  status: boolean;
-  rule: Rule | null;
+  status: RuleResultStatus;
+  matchedRule: Rule | null;
 }
+
+export type RuleResultStatus = "unknown" | "flagged" | "false_positive";

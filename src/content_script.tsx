@@ -11,8 +11,13 @@ chrome.runtime.onMessage.addListener(async function (
     const ruleEngine = new RuleEngine();
 
     const result = await ruleEngine.checkWebsite(website);
-    if (result.status) {
+    console.log("result", result);
+    if (result.status === "flagged") {
       document.body.style.backgroundColor = "#00ff00";
+    }
+
+    if (result.status === "false_positive") {
+      document.body.style.backgroundColor = "#ff0000";
     }
     sendResponse(result);
   }

@@ -67,33 +67,45 @@ export default class RuleEngine {
   async checkWebsite(website: any): Promise<RuleResult> {
     const rules = await this.loadRules();
     for (const rule of rules) {
-      if (this.matchRules(website, rule)) {
-        return {
-          status: true,
-          rule: rule,
-        };
+      if (this.matchRules(website, rule).matchedRule) {
+        return this.matchRules(website, rule);
       }
     }
 
     return {
-      status: false,
-      rule: null,
+      status: "unknown",
+      matchedRule: null,
     };
   }
 
-  matchRules(website: any, rule: Rule): boolean {
-    // match website against rule
+  matchRules(website: any, rule: Rule): RuleResult {
+    // false positive
+    if (
+      rule.composite_false_positives.length > 0 &&
+      this.matchCompositeConditionRules(website, rule.composite_false_positives)
+    ) {
+      console.log("MATCHED FALSE POSITIVE SITE");
+      return {
+        status: "false_positive",
+        matchedRule: rule,
+      };
+    }
+
+    // flagged safe
     if (
       this.matchCompositeConditionRules(website, rule.composite_flag_conditions)
     ) {
-      return true;
+      console.log("MATCHED FLAGGED SITE");
+      return {
+        status: "flagged",
+        matchedRule: rule,
+      };
     }
-    if (
-      this.matchCompositeConditionRules(website, rule.composite_false_positives)
-    ) {
-      return false;
-    }
-    return false;
+
+    return {
+      status: "unknown",
+      matchedRule: null,
+    };
   }
 
   matchCompositeConditionRules(
@@ -108,18 +120,20 @@ export default class RuleEngine {
         continue;
       }
       if (logical_operator == "and") {
-        for (const condition of conditions) {
-          if (!this.matchCondition(website, condition)) {
-            return false;
-          }
-
+        if (
+          conditions.every((condition) =>
+            this.matchCondition(website, condition)
+          )
+        ) {
           return true;
         }
       } else if (logical_operator == "or") {
-        for (const condition of conditions) {
-          if (this.matchCondition(website, condition)) {
-            return true;
-          }
+        if (
+          conditions.some((condition) =>
+            this.matchCondition(website, condition)
+          )
+        ) {
+          return true;
         }
       }
       return false;

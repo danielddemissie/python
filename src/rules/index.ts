@@ -1,6 +1,32 @@
 export async function getRules() {
   return [
     {
+      ruleID: "001",
+      name: "daniel domain",
+      authorName: "Daniel",
+      description: "Daniel's domain",
+      meta: "",
+      target: "",
+      composite_flag_conditions: [
+        {
+          logical_operator: "and",
+          conditions: [],
+        },
+      ],
+      composite_false_positives: [
+        {
+          logical_operator: "and",
+          conditions: [
+            {
+              attribute: "html",
+              operator: "contains",
+              value: "I`m Daniel",
+            },
+          ],
+        },
+      ],
+    },
+    {
       ruleID: "-cf02bcfe4ffa45bf9367155ea9ec4f7f",
       name: "123 Reg phishing kit 63c26",
       authorName: "Anonymous",
